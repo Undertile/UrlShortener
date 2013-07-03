@@ -1,4 +1,4 @@
-UrlShortener
+UT-UrlShortener 0.1
 ============
 
 Node.js Url shortener.
@@ -9,12 +9,9 @@ Fast and distributed UrlShortened.
 Url are stored as empty files in a AWS S3 Bucket. The HTTP headers are set to redirect to the target URL
 
 
+License
 
-
-
-
-
- This file is part of UT-UrlShortener.
+    This file is part of UT-UrlShortener.
 
     Foobar is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,3 +25,10 @@ Url are stored as empty files in a AWS S3 Bucket. The HTTP headers are set to re
 
     You should have received a copy of the GNU General Public License
     along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Contributing
+
+Contributions are very welcome. Please feel free to fork this project and hack on it. Go ahead and check out the issues tab to see what needs to be done! Go on! Do it!
+
+ 
