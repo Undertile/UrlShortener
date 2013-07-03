@@ -6,7 +6,7 @@
 Node.js Url shortener.
 
 
-Fast and distributed UrlShortened. 
+Fast and distributed node.js Url Shortener. 
 
 Url are stored as empty files in a AWS S3 Bucket. The HTTP headers are set to redirect to the target URL
 
