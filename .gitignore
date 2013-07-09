@@ -3,4 +3,6 @@ $ cat .gitignore
 *~
 .settings
 .project
+.metadata
+.gitignore
 
