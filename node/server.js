@@ -19,10 +19,14 @@ function iniciar(route) {
   }}
   
   function getKeys(obj){
-	  	console.log("calculant el hash de"+obj);
+	  	console.log("calculant el hash de "+obj);
 	    var key;
-	    key=hex_md5(obj);
-	    console.log("el hash es" + key);
+	    key=md5.md5(obj);
+	    console.log("el hash es " + key);
+	    key=key.substring(0,8);
+	    console.log("el hash retallat es " + key);
+
+	    
 	    return key;
 	    
 	}

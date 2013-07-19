@@ -26,6 +26,10 @@ function hex_hmac_md5(key, data) { return binl2hex(core_hmac_md5(key, data)); }
 function b64_hmac_md5(key, data) { return binl2b64(core_hmac_md5(key, data)); }
 function str_hmac_md5(key, data) { return binl2str(core_hmac_md5(key, data)); }
 
+
+exports.md5 = b64_md5;
+	
+	
 /*
  * Perform a simple self-test to see if the VM is working
  */
@@ -239,7 +243,7 @@ function binl2hex(binarray)
  */
 function binl2b64(binarray)
 {
-  var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  var tab = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*-";
   var str = "";
   for(var i = 0; i < binarray.length * 4; i += 3)
   {
