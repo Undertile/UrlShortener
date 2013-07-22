@@ -2,8 +2,6 @@ var http = require("http");
 
 var md5 = require("./md5");
 
-//var credentials = require ("/etc/UrlShortener/credentials.json");
-
 var AWS = require('aws-sdk');
 
 AWS.config.loadFromPath("/etc/UrlShortener/credencialsS3.json");
@@ -15,20 +13,18 @@ var s3 = new AWS.S3();
 function iniciar(route) {
   function onRequest(request, response) {
 	var pathname = url.parse(request.url).pathname;
+	pathname=pathname.substring(1,pathname.lenght);
     
 	if (request.url != '/favicon.ico') {
 	console.log("Petició per "+pathname + " rebuda.");
 	
 
 	
-	//console.log(s3.listObjects({params: {Bucket:'undertile-urlshort'}}));
-    var shash = getKeys(pathname);
-    createObject(shash, 'http://undertile.com');
+	var shash = getKeys(pathname);
+    createObject(shash, pathname);
     llistar();
 
-   // route(pathname);
-    
-    
+       
     response.writeHead(200, {"Content-Type": "text/html"});
     response.write("Tot a punt");
     
@@ -36,7 +32,7 @@ function iniciar(route) {
   }}
   
   function getKeys(obj){
-	  	console.log("calculant el hash de"+obj);
+	  	console.log("calculant el hash de "+obj);
 	    var key;
 	    key= md5.md5(obj);
             var key2; 
