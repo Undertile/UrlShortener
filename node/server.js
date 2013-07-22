@@ -15,6 +15,7 @@ var s3 = new AWS.S3();
 function iniciar(route) {
   function onRequest(request, response) {
 	var pathname = url.parse(request.url).pathname;
+	pathname=pathname.substring(1,pathname.lenght);
     
 	if (request.url != '/favicon.ico') {
 	console.log("Petició per "+pathname + " rebuda.");
@@ -23,7 +24,7 @@ function iniciar(route) {
 	
 	//console.log(s3.listObjects({params: {Bucket:'undertile-urlshort'}}));
     var shash = getKeys(pathname);
-    createObject(shash, 'http://undertile.com');
+    createObject(shash, pathname);
     llistar();
 
    // route(pathname);
