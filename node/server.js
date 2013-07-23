@@ -22,8 +22,9 @@ function iniciar(route) {
 	
 	var shash = getKeys(pathname);
     createObject(shash, pathname);
-    llistar();
-
+   // llistar();
+    
+    console.log("Link és: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
        
     response.writeHead(200, {"Content-Type": "text/html"});
     response.write("Tot a punt");
@@ -44,7 +45,8 @@ function iniciar(route) {
 
   function createObject(shash,url){
 	  console.log("a punt per crear l'objecte");
-	  var params = {Bucket:'undertile-urlshort',Key:shash,WebsiteRedirectLocation:url, ContentType:'txt/html', CacheControl:'no-cache'};
+	  var params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url, 
+			  		ContentType:'text/html', CacheControl:'no-cache'};
 
 		s3.putObject(params, function(err, data){
 			if (err) {
@@ -54,7 +56,6 @@ function iniciar(route) {
 				console.log("Objectes ", data);
 			}
 		});
-	  
   }
   
   function llistar(){
