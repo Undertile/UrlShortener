@@ -21,12 +21,15 @@ function iniciar(route) {
 	var shash = getKeys(pathname);
 	//TODO abans de crear l'objecte s'ha de mirar si ja existeix i comprovar que tingui
 	//     la mateixa WebsiteRedirectLocation
-	// bucle:
+	// existeix = fals
+	// count = null
 	// 		readObject(shash, pathname)
+	// bucle:
+	//      while existeix=cert
 	//      shash = shash+count(afegit com a text)
-	// 		while sigui cert
+	// 		readObject(shash, pathname)	
 	// fi bucle
-	// Si count > 0 llavors fer un createObject 
+	// Si existeix=fals or count not null llavors fer un createObject 
 	
     createObject(shash, pathname);
    // llistar();
@@ -77,9 +80,9 @@ function iniciar(route) {
 			}
 		});
 	// Si existeix
-	//     Si data.WebsiteRediectLocation és igual a url enviada llavors retornar fals
-	//        													sino retorna cert
-	// Si no existeix l'objecte retorna cert
+	//     Si data.WebsiteRediectLocation és igual a url enviada llavors retornar existeix=fals
+	//        													sino retorna existeix=cert
+	// Si no existeix l'objecte retorna existeix=fals 
   }
   
   function llistar(){
