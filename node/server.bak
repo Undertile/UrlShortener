@@ -17,24 +17,17 @@ function iniciar(route) {
     
 	if (request.url != '/favicon.ico') {
 	console.log("Petició per "+pathname + " rebuda.");
-		
-	var shash = getKeys(pathname);
-	//TODO abans de crear l'objecte s'ha de mirar si ja existeix i comprovar que tingui
-	//     la mateixa WebsiteRedirectLocation
-	// bucle:
-	// 		readObject(shash, pathname)
-	//      shash = shash+count(afegit com a text)
-	// 		while sigui cert
-	// fi bucle
-	// Si count > 0 llavors fer un createObject 
 	
+
+	
+	var shash = getKeys(pathname);
     createObject(shash, pathname);
    // llistar();
     
     console.log("Link és: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
        
     response.writeHead(200, {"Content-Type": "text/html"});
-    response.write("Tot a punt...<br>");
+    response.write("Tot a punt...\n");
     response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
     response.end();
   }}
@@ -63,23 +56,6 @@ function iniciar(route) {
 				console.log("Objectes ", data);
 			}
 		});
-  }
-  function readObject(shash,url){
-	  console.log("llegint l'objecte");
-	  var params = {Bucket:'undertile-urlshort', Key:shash};
-//TODO mirar si és millor la funció headObject que sembla ser que llegeix només capçalera
-		s3.getObject(params, function(err, data){
-			if (err) {
-				console.log(err);
-			}
-			else {
-				console.log("Objectes ", data);
-			}
-		});
-	// Si existeix
-	//     Si data.WebsiteRediectLocation és igual a url enviada llavors retornar fals
-	//        													sino retorna cert
-	// Si no existeix l'objecte retorna cert
   }
   
   function llistar(){
