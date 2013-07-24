@@ -1,5 +1,7 @@
 var http = require("http");
 
+var url = require('url');
+
 var md5 = require("./md5");
 
 var AWS = require('aws-sdk');
@@ -11,14 +13,27 @@ var s3 = new AWS.S3();
 
 
 function iniciar(route) {
-  function onRequest(request, response) {
-	var pathname = url.parse(request.url).pathname;
-	pathname=pathname.substring(1,pathname.lenght);
-    
-	if (request.url != '/favicon.ico') {
-	console.log("Petició per "+pathname + " rebuda.");
+  
+	
+	function onRequest(request, response) {
+	  
+	  
+	  
+	  if (request.url != '/favicon.ico') {
+		  
+		  var pathname = url.parse(request.url).href;
+		  console.log("captured URL: "+ pathname);
+		  var params = getParams(pathname);
+		  var lurl= params["url"];
+		  var expires=params['expires'];
+		  
+		  
+		  
+		  console.log("Petition for "+lurl + " received.");
+		  console.log("this ShortUrl expires on  "+expires);
 		
-	var shash = getKeys(pathname);
+		  var shash = getKeys(lurl);
+		  
 	//TODO abans de crear l'objecte s'ha de mirar si ja existeix i comprovar que tingui
 	//     la mateixa WebsiteRedirectLocation
 	// existeix = fals
@@ -31,44 +46,79 @@ function iniciar(route) {
 	// fi bucle
 	// Si existeix=fals or count not null llavors fer un createObject 
 	
-    createObject(shash, pathname);
-   // llistar();
+		  
+		  
+		  
+    createObject(shash, lurl,expires);
+   
+    // llistar();
     
-    console.log("Link és: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
+    console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
        
     response.writeHead(200, {"Content-Type": "text/html"});
-    response.write("Tot a punt...<br>");
+    response.write("System ready...<br>");
     response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
     response.end();
   }}
   
-  function getKeys(obj){
-	  	console.log("calculant el hash de "+obj);
-	    var key;
-	    key= md5.md5(obj);
-            var key2; 
-            key2 = key.substring(0, 8);
-	    console.log("el hash es " + key2);
-	    return key2;
-	    
+  
+	
+/*
+ * This function returns 8 digits hash code of passed value
+ */
+function getKeys(obj){
+  	console.log("calculating hash of "+obj);
+    var key;
+    key= md5.md5(obj);
+           var key2; 
+           key2 = key.substring(0, 8);
+    console.log("8 digits hash is " + key2);
+    return key2;
 	}
 
-  function createObject(shash,url){
-	  console.log("a punt per crear l'objecte");
-	  var params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url, 
-			  		ContentType:'text/html', CacheControl:'no-cache'};
+	
+/*
+ * This function creates s3 object. It defines s3 parameters on 'params' variable.
+ * If there is a expiration date, it creates s3 object with this expiration.
+ */
+  function createObject(shash,url,expires){
+	  
+	  
+	  console.log("ready to create object... ");
+	  
+	  var params = null;
+	  
+	  if ( expires == null) {
+		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url,
+ContentType:'text/html', CacheControl:'no-cache'};
+	  }
+	  
+	  else {
+		//TODO si el paràmetre expires té valor, s'ha de convertir aquesta data al format vàlid
+		  //http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21
+		  
+		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url, 
+					
+			  		ContentType:'text/html', CacheControl:'no-cache', Expires:'expires'};
+	  };
 
 		s3.putObject(params, function(err, data){
 			if (err) {
 				console.log(err);
 			}
 			else {
-				console.log("Objectes ", data);
+				console.log("Objects ", data);
 			}
 		});
   }
+  
+  
+  
+ /*Function Not used at this time.....
+  * 
+  */
   function readObject(shash,url){
-	  console.log("llegint l'objecte");
+	  console.log("reading object");
 	  var params = {Bucket:'undertile-urlshort', Key:shash};
 //TODO mirar si és millor la funció headObject que sembla ser que llegeix només capçalera
 		s3.getObject(params, function(err, data){
@@ -76,7 +126,7 @@ function iniciar(route) {
 				console.log(err);
 			}
 			else {
-				console.log("Objectes ", data);
+				console.log("Objects ", data);
 			}
 		});
 	// Si existeix
@@ -85,6 +135,10 @@ function iniciar(route) {
 	// Si no existeix l'objecte retorna existeix=fals 
   }
   
+  
+ /*Function Not used at this time.....
+  * 
+  */
   function llistar(){
 			var params = {Bucket:'undertile-urlshort'};
 
@@ -93,17 +147,41 @@ function iniciar(route) {
 					console.log(err);
 				}
 				else {
-					console.log("Objectes ", data);
+					console.log("Objects ", data);
 				}
 			});}
 	  
  
   http.createServer(onRequest).listen(8080);
-  console.log("Servidor Iniciat.");
+  console.log("Server is started... ");
 }
+
+
+/*
+ * This function captures parameters from the url. First parameter is behind ?, 
+ * Other parameters are behind & symbol.
+ * It returns an array with this parameters.
+ * Example: http://localhost:8080/?url=http://undertile.com&expires=31122015 returns an array
+ * with url->http://undertile.com and expiration date->31122015
+ */
+
+function getParams(url)
+{
+	
+	var params = [];    
+	url=url.split('?')[1];
+	var vrs = url.split('&');
+    
+	for (var x = 0, c = vrs.length; x < c; x++) 
+        {
+        	var param = vrs[x].split('=');
+        	params[param[0]] = decodeURIComponent(param[1]);
+        };
+                
+    return params;
+};
 
 exports.iniciar = iniciar;
 
-var http = require("http");
-var url = require("url");
+
 
