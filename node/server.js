@@ -34,31 +34,19 @@ function iniciar(route) {
 		
 		  var shash = getKeys(lurl);
 		  
-	//TODO abans de crear l'objecte s'ha de mirar si ja existeix i comprovar que tingui
-	//     la mateixa WebsiteRedirectLocation
-	// existeix = fals
-	// count = null
-	// 		readObject(shash, pathname)
-	// bucle:
-	//      while existeix=cert
-	//      shash = shash+count(afegit com a text)
-	// 		readObject(shash, pathname)	
-	// fi bucle
-	// Si existeix=fals or count not null llavors fer un createObject 
-	
 		  
+		  // readObject(shash, lurl);
 		  
-		  
-    createObject(shash, lurl,expires);
+		  createObject(shash, lurl,expires);
    
-    // llistar();
+		  // llistar();
     
-    console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
+		  console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
        
-    response.writeHead(200, {"Content-Type": "text/html"});
-    response.write("System ready...<br>");
-    response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
-    response.end();
+		  response.writeHead(200, {"Content-Type": "text/html"});
+		  response.write("System ready...<br>");
+		  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
+		  response.end();
   }}
   
   
@@ -90,7 +78,7 @@ function getKeys(obj){
 	  
 	  if ( expires == null) {
 		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url,
-ContentType:'text/html', CacheControl:'no-cache'};
+				  ContentType:'text/html', CacheControl:'no-cache'};
 	  }
 	  
 	  else {
@@ -118,21 +106,22 @@ ContentType:'text/html', CacheControl:'no-cache'};
   * 
   */
   function readObject(shash,url){
-	  console.log("reading object");
+	  console.log("reading object...");
 	  var params = {Bucket:'undertile-urlshort', Key:shash};
-//TODO mirar si és millor la funció headObject que sembla ser que llegeix només capçalera
-		s3.getObject(params, function(err, data){
+	  
+	  s3.headObject(params, function(err, data){
 			if (err) {
 				console.log(err);
+				console.log("No existeix");
 			}
 			else {
 				console.log("Objects ", data);
+				console.log("Existeix");
+				if (data.WebsiteRedirectLocation == url) {
+					console.log("Mateixa URL");}
+				else {console.log("Diferent URL");}
 			}
 		});
-	// Si existeix
-	//     Si data.WebsiteRediectLocation és igual a url enviada llavors retornar existeix=fals
-	//        													sino retorna existeix=cert
-	// Si no existeix l'objecte retorna existeix=fals 
   }
   
   
