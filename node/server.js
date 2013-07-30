@@ -17,8 +17,6 @@ function iniciar() {
 	
 	function onRequest(request, response) {
 	  
-	  
-	  
 	  if (request.url != '/favicon.ico') {
 		  
 		  var pathname = url.parse(request.url).href;
@@ -27,14 +25,12 @@ function iniciar() {
 		  var lurl= params["url"];
 		  var expires=params['expires']; //Here we can add any needed parameter
 		  
-		  
-		  
 		  console.log("Petition for "+lurl + " received.");
 		  console.log("this ShortUrl expires on  "+expires);
 		  		  
 		  var shash = getKeys(lurl);
 		  
-		  obtenirHashValid(shash, lurl, function (shash,e) {
+		  getValidHash(shash, lurl, function (shash,e) {
 			  
 			  if (e==0) {
 				  createObject(shash, lurl,expires);
@@ -47,35 +43,15 @@ function iniciar() {
 			  response.write("System ready...<br>");
 			  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
 			  response.end();
-			  			  
-			  	  
+			 
 		  });
-		  
-		  
-		  
-		  //while (exist==2) {
-			//  shash=shash+'1';
-			  //exist= exists(shash, lurl);
-		  //} 
-		  
-		 // if (exist==0) {createObject(shash, lurl,expires);}
-		  
-   
-		  // llistar();
-    //
-	//	  console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
-    //   
-	//	  response.writeHead(200, {"Content-Type": "text/html"});
-	//	  response.write("System ready...<br>");
-	//	  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
-	//	  response.end();
   }}
   
-
-	function obtenirHashValid(shash, lurl, callback) {
-		  
-		  //readObject(shash, lurl);
-		  exists(shash, lurl, function (e) {
+	/*
+	 * This function returns a valid hash with e parameter to indicate if object should be created.
+	 */
+	function getValidHash(shash, lurl, callback) {
+			exists(shash, lurl, function (e) {
 			  console.log ('valor de exist=' +e);  
 		  
 			  if (e==0) {
@@ -87,7 +63,7 @@ function iniciar() {
 			  else if (e==2){
 				  shash=shash+'1';
 				  console.log ('el nou hash és '+shash);
-				  obtenirHashValid(shash, lurl, callback);
+				  getValidHash(shash, lurl, callback);
 			  }
 			  
 		  });
@@ -113,7 +89,7 @@ function getKeys(obj){
  * This function creates s3 object. It defines s3 parameters on 'params' variable.
  * If there is a expiration date, it creates s3 object with this expiration.
  */
-  function createObject(shash,url,expires){
+  function createObject(shash,lurl,expires){
 	  
 	  
 	  console.log("ready to create object... ");
@@ -121,7 +97,7 @@ function getKeys(obj){
 	  var params = null;
 	  
 	  if ( expires == null) {
-		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url,
+		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl,
 				  ContentType:'text/html', CacheControl:'no-cache'};
 	  }
 	  
@@ -129,7 +105,7 @@ function getKeys(obj){
 		//TODO si el paràmetre expires té valor, s'ha de convertir aquesta data al format vàlid
 		  //http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21
 		  
-		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:url, 
+		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl, 
 					
 			  		ContentType:'text/html', CacheControl:'no-cache', Expires:'expires'};
 	  };
@@ -146,28 +122,6 @@ function getKeys(obj){
   
   
   
-  /*Function Not used at this time.....
-   * 
-   
-   function readObject(shash,url){
- 	  console.log("reading object...");
- 	  var params = {Bucket:'undertile-urlshort', Key:shash};
-
- 	  s3.headObject(params, function(err, data){
- 			if (err) {
- 				console.log(err);
- 				console.log("No existeix");
- 			}
- 			else {
- 				console.log("Objects ", data);
- 				console.log("Existeix");
- 				if (data.WebsiteRedirectLocation == url) {
- 					console.log("Mateixa URL");}
- 				else {console.log("Diferent URL");}
- 			}
- 		});
-   }
-  */
    
    /*This Function is used to know if url redirect already exists:
     * Return 0 when this object doesn't exist.
@@ -175,21 +129,20 @@ function getKeys(obj){
     * Return 2 when this object exists but doesn't have the same redirect.
     * 
     */
-    function exists(shash,url, callback){
+    function exists(shash,lurl, callback){
   	  console.log("reading object...");
   	  var params = {Bucket:'undertile-urlshort', Key:shash};
   	  
 
   	  s3.headObject(params, function(err, data){
   			if (err) {
-  				//console.log(err);
   				console.log("No existeix");
   				callback(0);
   				  			}
   			else {
-  				//console.log("Objects ", data);
   				
-  				if (data.WebsiteRedirectLocation == url) {
+  				
+  				if (data.WebsiteRedirectLocation == lurl) {
   					console.log("Existeix i té la mateixa URL. No cal fer res... ");
   					callback(1);
   				} else {
