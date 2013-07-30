@@ -35,6 +35,11 @@ function iniciar() {
 		  var shash = getKeys(lurl);
 		  
 		  obtenirHashValid(shash, lurl, function (shash,e) {
+			  
+			  if (e==0) {
+				  createObject(shash, lurl,expires);
+				  
+			  }		
 			 
 			  console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
 		       
@@ -43,10 +48,7 @@ function iniciar() {
 			  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
 			  response.end();
 			  			  
-			  if (e=0) {
-				  createObject(shash, lurl,expires);
-				  
-			  }			  
+			  	  
 		  });
 		  
 		  
@@ -74,7 +76,7 @@ function iniciar() {
 		  
 		  //readObject(shash, lurl);
 		  exists(shash, lurl, function (e) {
-			  //console.log ('valor de exist=' +e);  
+			  console.log ('valor de exist=' +e);  
 		  
 			  if (e==0) {
 				  callback(shash,0);  
