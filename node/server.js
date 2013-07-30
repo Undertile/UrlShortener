@@ -45,6 +45,8 @@ function iniciar() {
 			  response.end();
 			 
 		  });
+		  
+		  //llistar();
   }}
   
 	/*
@@ -104,10 +106,10 @@ function getKeys(obj){
 	  else {
 		//TODO si el paràmetre expires té valor, s'ha de convertir aquesta data al format vàlid
 		  //http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21
+		  console.log("Hem rebut la data de caducitat "+ expires);
+		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl,					
+			  		ContentType:'text/html', CacheControl:'no-cache', Expires:expires};
 		  
-		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl, 
-					
-			  		ContentType:'text/html', CacheControl:'no-cache', Expires:'expires'};
 	  };
 
 		s3.putObject(params, function(err, data){
@@ -134,14 +136,17 @@ function getKeys(obj){
   	  var params = {Bucket:'undertile-urlshort', Key:shash};
   	  
 
-  	  s3.headObject(params, function(err, data){
+  	 s3.headObject(params, function(err, data){
+  		  
   			if (err) {
   				console.log("No existeix");
   				callback(0);
   				  			}
   			else {
   				
-  				
+  	  		  console.log("Caduca: "+data.Expires);
+
+  	  		  
   				if (data.WebsiteRedirectLocation == lurl) {
   					console.log("Existeix i té la mateixa URL. No cal fer res... ");
   					callback(1);
