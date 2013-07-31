@@ -16,4 +16,4 @@
 
 var server = require("./server");
 
-server.iniciar();
+server.start();

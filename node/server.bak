@@ -12,7 +12,7 @@ var s3 = new AWS.S3();
 
 
 
-function iniciar() {	
+function start() {	
   
 	
 	function onRequest(request, response) {
@@ -23,17 +23,17 @@ function iniciar() {
 		  console.log("captured URL: "+ pathname);
 		  var params = getParams(pathname);
 		  var lurl= params["url"];
-		  var expires=params['expires']; //Here we can add any needed parameter
+		  var language=params['language']; //Here we can add any needed parameter
 		  
-		  console.log("Petition for "+lurl + " received.");
-		  console.log("this ShortUrl expires on  "+expires);
+		  console.log("Petition for " + lurl + " received.");
+		  console.log("This ShortUrl has language in  " + language);
 		  		  
 		  var shash = getKeys(lurl);
 		  
 		  getValidHash(shash, lurl, function (shash,e) {
 			  
 			  if (e==0) {
-				  createObject(shash, lurl,expires);
+				  createObject(shash, lurl, language);
 				  
 			  }		
 			 
@@ -45,6 +45,8 @@ function iniciar() {
 			  response.end();
 			 
 		  });
+		  
+		  //llistar();
   }}
   
 	/*
@@ -87,27 +89,25 @@ function getKeys(obj){
 	
 /*
  * This function creates s3 object. It defines s3 parameters on 'params' variable.
- * If there is a expiration date, it creates s3 object with this expiration.
+ * If there language defined, it creates s3 object with this parameter.
  */
-  function createObject(shash,lurl,expires){
+  function createObject(shash, lurl, language){
 	  
 	  
 	  console.log("ready to create object... ");
 	  
 	  var params = null;
 	  
-	  if ( expires == null) {
+	  if ( language == null) {
 		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl,
 				  ContentType:'text/html', CacheControl:'no-cache'};
 	  }
 	  
 	  else {
-		//TODO si el paràmetre expires té valor, s'ha de convertir aquesta data al format vàlid
-		  //http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.21
+		  console.log("Hem rebut parametre d'idioma "+ language);
+		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl,					
+			  		ContentType:'text/html', CacheControl:'no-cache', ContentLanguage:language};
 		  
-		  params = {Bucket:'undertile-urlshort', Key:shash, WebsiteRedirectLocation:lurl, 
-					
-			  		ContentType:'text/html', CacheControl:'no-cache', Expires:'expires'};
 	  };
 
 		s3.putObject(params, function(err, data){
@@ -120,29 +120,30 @@ function getKeys(obj){
 		});
   }
   
-  
-  
-   
+    
    /*This Function is used to know if url redirect already exists:
     * Return 0 when this object doesn't exist.
     * Return 1 when this object exists and have the same redirect.
     * Return 2 when this object exists but doesn't have the same redirect.
     * 
     */
-    function exists(shash,lurl, callback){
+    function exists(shash, lurl, callback){
   	  console.log("reading object...");
   	  var params = {Bucket:'undertile-urlshort', Key:shash};
   	  
 
-  	  s3.headObject(params, function(err, data){
+  	 s3.headObject(params, function(err, data){
+  		  
   			if (err) {
   				console.log("No existeix");
   				callback(0);
   				  			}
   			else {
   				
-  				
-  				if (data.WebsiteRedirectLocation == lurl) {
+  	  		  	console.log("Idioma: "+data.ContentLanguage);
+  	  		  	
+  	  		  
+  				if ((data.WebsiteRedirectLocation == lurl)&&(data.ContentLanguage == language) {
   					console.log("Existeix i té la mateixa URL. No cal fer res... ");
   					callback(1);
   				} else {
@@ -180,8 +181,8 @@ function getKeys(obj){
  * This function captures parameters from the url. First parameter is behind ?, 
  * Other parameters are behind & symbol.
  * It returns an array with this parameters.
- * Example: http://localhost:8080/?url=http://undertile.com&expires=31122015 returns an array
- * with url->http://undertile.com and expiration date->31122015
+ * Example: http://localhost:8080/?url=http://undertile.com&language='es' returns an array
+ * with url->http://undertile.com and language->es
  */
 
 function getParams(url)
@@ -203,7 +204,7 @@ function getParams(url)
 
 
 
-exports.iniciar = iniciar;
+exports.start = start;
 
 
 
