@@ -20,6 +20,12 @@ function start() {
 	  if (request.url != '/favicon.ico') {
 		  
 		  var pathname = url.parse(request.url).href;
+		  //var method = getMethod(pathname);    
+		  var method=pathname.split('?');
+		  if (method[0]=="/shorten"){
+			  console.log("has "+ method[0]);  
+		  	}
+		  		  
 		  console.log("captured URL: "+ pathname);
 		  var params = getParams(pathname);
 		  var lurl= params["url"];
@@ -185,6 +191,10 @@ function getParams(url)
     return params;
 };
 
+function getMethod(m)
+{    
+	
+};
 
 
 
