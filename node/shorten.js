@@ -1,21 +1,18 @@
+/* This module, given a long URL, returns a short URL,
+ * and it saves the object to Amazon's S3 Bucket.
+ * Parameters:
+ * 	- Long URL (?url and others with &).
+ * Return values:
+ *  - The key (name) of the object created.
+ */
+	var url = require('url');
+	var md5 = require("./md5");
+	var config = require('./config')
+	var AWS = require('aws-sdk');
+	AWS.config.loadFromPath(config.S3.CredentialsPath);
+	var s3 = new AWS.S3();
 
-var url = require('url');
-
-var md5 = require("./md5");
-
-var config = require('./config')
-
-var AWS = require('aws-sdk');
-
-//AWS.config.loadFromPath("/etc/UrlShortener/credencialsS3.json");
-
-AWS.config.loadFromPath(config.S3.CredentialsPath);
-
-var s3 = new AWS.S3();
-
-
-
-function shorten(paramsUrl, callback) {	
+function shorten(paramsUrl, callback) {
 		  var pathname = paramsUrl;
 		  console.log("captured URL: "+ pathname);
 		  var params = getParams(pathname);
@@ -33,10 +30,10 @@ function shorten(paramsUrl, callback) {
 			 
 			  console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
 		       
-			  response.writeHead(200, {"Content-Type": "text/html"});
-			  response.write("System ready...<br>");
-			  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
-			  response.end();
+//			  response.writeHead(200, {"Content-Type": "text/html"});
+//			  response.write("System ready...<br>");
+//			  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
+//			  response.end();
 			  callback(shash);
 		  });
 }
