@@ -14,6 +14,6 @@
 
 
 
-var server = require("./server3");
+var server = require("./server");
 
 server.start();
