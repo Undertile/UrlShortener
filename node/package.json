@@ -1,8 +1,8 @@
 {
-  "name": "node",
-  "version": "0.1.0",
-  "description": "node",
-  "main": "hello-world-server.js",
+  "name": "undertile-urlshortener",
+  "version": "0.1",
+  "description": "s3 urlshortener",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified! Configure in package.json\" && exit 1"
   },
@@ -12,7 +12,7 @@
     "Eclipse",
     "Nodeclipse"
   ],
-  "author": "",
-  "license": "BSD",
+  "author": "Undertile",
+  "license": "GPL_v3",
   "readmeFilename": "README.md"
 }
