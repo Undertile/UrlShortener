@@ -19,10 +19,9 @@ function start() {
 			case "/shorten":
 				console.log("has "+ method[0]);
 				shorten.shorten(pathname, function(numhash){
-					console.log("Ha fet servir el hash "+numhash);
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write("System ready...<br>");
-					response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+numhash);
+					response.write('Link: '+config.local.Link+numhash);
 					response.end();
 				});
 				break;
@@ -34,15 +33,9 @@ function start() {
 				console.log("It has a incorrect URL");
 			break;
 			}
-
-			//console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
-
-
-
 		};
 
 	}
-
 	http.createServer(onRequest).listen(config.servidor.Port);
 	console.log("Server is started... ");
 }

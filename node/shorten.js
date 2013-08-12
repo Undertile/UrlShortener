@@ -29,11 +29,6 @@ function shorten(paramsUrl, callback) {
 			  }		
 			 
 			  console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
-		       
-//			  response.writeHead(200, {"Content-Type": "text/html"});
-//			  response.write("System ready...<br>");
-//			  response.write('Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/'+shash);
-//			  response.end();
 			  callback(shash);
 		  });
 }
@@ -117,7 +112,7 @@ function getKeys(obj){
   				callback(0);
   				  			}
   			else {
-  				
+  				console.log("Versio: " + data.VersionId);
   				if (data.WebsiteRedirectLocation == lurl) {
   					console.log("Existeix i té la mateixa URL. No cal fer res... ");
   					callback(1);
