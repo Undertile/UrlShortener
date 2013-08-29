@@ -1,4 +1,4 @@
-var config = {}
+var config = {};
 
 config.S3 = {};
 config.servidor = {};
