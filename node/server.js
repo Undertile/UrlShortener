@@ -11,7 +11,7 @@ function start() {
 
 			var pathname = url.parse(request.url).href;
 			var method = pathname.split('?');
-			var numhash;
+			//var numhash;
 
 			switch(method[0])
 			{
