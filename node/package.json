@@ -1,18 +1,27 @@
 {
-  "name": "undertile-urlshortener",
+  "name": "ut-urlshortener",
   "version": "0.1",
-  "description": "s3 urlshortener",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified! Configure in package.json\" && exit 1"
-  },
-  "repository": "",
-  "keywords": [
-    "Node.js",
-    "Eclipse",
-    "Nodeclipse"
-  ],
-  "author": "Undertile",
-  "license": "GPL_v3",
-  "readmeFilename": "README.md"
+  "dependencies": {
+	    "aws-sdk": {
+	      "version": "1.5.1",
+	      "dependencies": {
+	        "xml2js": {
+	          "version": "0.2.4",
+	          "dependencies": {
+	            "sax": {
+	              "version": "0.5.5"
+	            }
+	          }
+	        },
+	        "xmlbuilder": {
+	          "version": "0.4.2"
+	        }
+	      }
+	    }
+	  }
+
+  "engines": {
+    "node": "0.6.12",
+    "npm": "1.1.4"
+  }
 }
