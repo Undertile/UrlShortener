@@ -14,21 +14,14 @@
 
 function shorten(paramsUrl, callback) {
 		  var pathname = paramsUrl;
-		  console.log("captured URL: "+ pathname);
 		  var params = getParams(pathname);
 		  var lurl= params["url"];
-		  
-		  console.log("Petition for " + lurl + " received.");
-		  		  
 		  var shash = getKeys(lurl);
-		  
 		  getValidHash(shash, lurl, function (shash,e) {
 			  
 			  if (e==0) {
 				  createObject(shash, lurl);
 			  }		
-			 
-			  console.log("Link: http://undertile-urlshort.s3-website-eu-west-1.amazonaws.com/"+shash);
 			  callback(shash);
 		  });
 }
@@ -38,8 +31,6 @@ function shorten(paramsUrl, callback) {
 	 */
 	function getValidHash(shash, lurl, callback) {
 			exists(shash, lurl, function (e) {
-			  console.log ('valor de exist=' +e);  
-		  
 			  if (e==0) {
 				  callback(shash,0);  
 			  } 				 
@@ -48,36 +39,26 @@ function shorten(paramsUrl, callback) {
 			  }
 			  else if (e==2){
 				  shash=shash+'1';
-				  console.log ('el nou hash és '+shash);
 				  getValidHash(shash, lurl, callback);
 			  }
 			  
 		  });
 		  
 	}
-	
-	
 /*
  * This function returns 8 digits hash code of passed value
  */
 function getKeys(obj){
-  	console.log("calculating hash of "+obj);
     var key;
     key= md5.md5(obj);
            var key2; 
            key2 = key.substring(0, 8);
-    console.log("8 digits hash is " + key2);
     return key2;
 	}
-
-	
 /*
  * This function creates s3 object. It defines s3 parameters on 'params' variable.
  */
   function createObject(shash, lurl){
-
-	  console.log("ready to create object... ");
-	  
 	  var params = null;
 	  
 	  params = {Bucket:config.S3.Bucket, Key:shash, WebsiteRedirectLocation:lurl,
@@ -86,9 +67,6 @@ function getKeys(obj){
 	  s3.putObject(params, function(err, data){
 			if (err) {
 				console.log(err);
-			}
-			else {
-				console.log("Objects ", data);
 			}
 		});
   }
@@ -101,23 +79,16 @@ function getKeys(obj){
     * 
     */
     function exists(shash, lurl, callback){
-  	  console.log("reading object...");
   	  var params = {Bucket:config.S3.Bucket, Key:shash};
-  	  
-
   	 s3.headObject(params, function(err, data){
   		  
   			if (err) {
-  				console.log("No existeix");
   				callback(0);
   				  			}
   			else {
-  				console.log("Versio: " + data.VersionId);
   				if (data.WebsiteRedirectLocation == lurl) {
-  					console.log("Existeix i té la mateixa URL. No cal fer res... ");
   					callback(1);
   				} else {
-  					console.log("Existeix però té diferent URL. Cal crear un hash nou.");
   					callback(2);
   				}
   			}
@@ -136,7 +107,6 @@ function getKeys(obj){
 
 function getParams(url)
 {
-	
 	var params = [];    
 	url=url.split('?')[1];
 	var vrs = url.split('&');

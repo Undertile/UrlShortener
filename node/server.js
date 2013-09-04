@@ -1,7 +1,6 @@
 var http = require("http");
 var url = require('url');
 var shorten = require('./shorten.js');
-var list = require('./list.js');
 var config = require('./config');
 
 function start() {	
@@ -17,17 +16,12 @@ function start() {
 			switch(method[0])
 			{
 			case "/shorten":
-				console.log("has "+ method[0]);
 				shorten.shorten(pathname, function(numhash){
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write("System ready...<br>");
 					response.write('Link: '+config.local.Link+numhash);
 					response.end();
 				});
-				break;
-			case "/list":
-				console.log("has "+ method[0]);
-				list.list();
 				break;
 			default:
 				console.log("It has a incorrect URL");
@@ -37,7 +31,6 @@ function start() {
 
 	}
 	http.createServer(onRequest).listen(config.servidor.Port);
-	console.log("Server is started... ");
 }
 
 
