@@ -19,7 +19,7 @@ function start() {
 				shorten.shorten(pathname, function(numhash){
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write("System ready...<br>");
-					response.write('Link: '+config.local.Link+numhash);
+					response.write(config.local.Link+numhash);
 					response.end();
 				});
 				break;
