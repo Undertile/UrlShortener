@@ -7,7 +7,7 @@
  */
 	var url = require('url');
 	var md5 = require("./md5");
-	var config = require('./config')
+	var config = require('./config');
 	var AWS = require('aws-sdk');
 	AWS.config.loadFromPath(config.S3.CredentialsPath);
 	var s3 = new AWS.S3();
