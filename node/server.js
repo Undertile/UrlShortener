@@ -1,6 +1,7 @@
 var http = require("http");
 var url = require('url');
 var shorten = require('./shorten.js');
+var version = require('./version.js');
 var config = require('./config');
 
 function start() {	
@@ -16,6 +17,13 @@ function start() {
 			{
 			case "/shorten":
 				shorten.shorten(pathname, function(numhash){
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write(config.local.Link+numhash);
+					response.end();
+				});
+				break;
+			case "/version":
+				version.version(pathname, function(numhash){
 					response.writeHead(200, {"Content-Type": "text/html"});
 					response.write(config.local.Link+numhash);
 					response.end();
