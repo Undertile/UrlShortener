@@ -2,6 +2,7 @@ var http = require("http");
 var url = require('url');
 var shorten = require('./shorten.js');
 var version = require('./version.js');
+var version = require('./collision.js');
 var config = require('./config');
 
 function start() {	
@@ -29,6 +30,14 @@ function start() {
 					response.end();
 				});
 				break;
+			case "/collision":
+				collision.collision(pathname, function(numhash){
+					response.writeHead(200, {"Content-Type": "text/html"});
+					response.write(config.local.Link+numhash);
+					response.end();
+				});
+				break;
+				
 			default:
 				console.log("It has a incorrect URL");
 			break;
