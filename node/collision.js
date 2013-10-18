@@ -32,13 +32,20 @@ function collision(paramsUrl, callback) {
 	function getValidHash(shash, lurl, callback) {
 			existURL(shash, lurl, function (e) {
 			  if (e==0) {
+				  // crea directament sense mirar res
 				  createObject(shash, lurl, function (vers){
+					  // mira si existeix una altra versio
 					  existAnotherVersion(shash, lurl, vers, function (t){
-						  if (t==0) {
+						  // si retorna 1 ja plega
+						  if (t==1) {
+							  callback(shash,0);}
+						  // si retorna 2 suma 1 al num hash 
+						  else if (t==2) {
+							  shash=shash+'1';
 							  getValidHash(shash, lurl, callback);}
 							  });
 				  	});
-					  callback(shash,0);  
+					  //callback(shash,0);  
 				  });
 				    
 			  } 				 
@@ -134,18 +141,21 @@ function getKeys(obj){
    				callback(0);
    				  			}
    			else {
+   				// comprova si nomes hi ha una sola versio i retorna 1
    				if (data.Versions.length == 0){
    					if (data.Versions[0].VersionId == vers){
    						console.log('Sols un i te la mateixa versio');
    						console.log(vers);
    						callback(1);
    						}
+   					// cas d'error i retorn 0
    					else {
    						console.log('No coincideix versio');
    						callback(0);
    						}
    					}
    				else {
+   					// recorre totes les versions per trobar la mes antiga
    					var pos=0;
    					var keyObject='';
    					var dataVer = data.Versions[0].LastModified;
@@ -155,17 +165,24 @@ function getKeys(obj){
    							 keyObject = data.Versions[i].Key;
    							 pos=i;}
    					}
+   					// comprova si la versio mes vella es igual a la gravada
+   					// i retorna 1
    					if (data.Versions[pos].VersionId == ver){
    						console.log('Es el mes antic');
    						callback(1);
    					}
    					else {
+   						// si no es la mes vella treu l'entrada
    						deleteObject(shash, lurl, vers, function(err, data){
    						if (!err){
+   							// mira si la URL es la mateixa
+   							// si es afimatiu retorna 1
+   							// sino retorn 2
    							existsURL(shash, lurl, function (e) {
-   								  callback(e);});
-   							}
-   						});
+   								  if(e==1){callback(1);}
+   								  else if (e==2){callback(2)});
+   							});
+   						}
    					}
    				}
    			}
