@@ -35,7 +35,7 @@ function collision(paramsUrl, callback) {
 				  // crea directament sense mirar res
 				  createObject(shash, lurl, function (vers){
 					  // mira si existeix una altra versio
-					  existAnotherVersion(shash, lurl, vers, function (t){
+					  checkOthersVersions(shash, lurl, vers, function (t){
 						  // si retorna 1 ja plega
 						  if (t==1) {
 							  callback(shash,0);}
@@ -60,16 +60,7 @@ function collision(paramsUrl, callback) {
 		  });
 		  
 	}
-/*
- * This function returns 8 digits hash code of passed value
- */
-function getKeys(obj){
-    var key;
-    key= md5.md5(obj);
-           var key2; 
-           key2 = key.substring(0, 8);
-    return key2;
-	}
+	
 /*
  * This function creates s3 object. It defines s3 parameters on 'params' variable.
  */
@@ -88,6 +79,74 @@ function getKeys(obj){
 		});
   }
 
+  /*This function check if there are others versions of the object
+   * Return 0 when there is an error.
+   * Return 1 when the object is the only one and with the correct URL.
+   * Return 2 when the object must be changed.
+   * 
+   */
+  
+  function checkOthersVersions(shash, lurl, vers, callback){
+	  var params = {Bucket:config.S3.Bucket, Prefix:shash};
+	  s3.listObjectVersions(params, function(err, data){
+			if (err) {
+				console.log(err);
+				callback(0);
+				  			}
+			else {
+				// comprova si nomes hi ha una sola versio i retorna 1 de ok
+				if (data.Versions.length == 0){
+					if (data.Versions[0].VersionId == vers){
+						console.log('Sols un i te la mateixa versio');
+						console.log(vers);
+						callback(1);
+						}
+					// cas d'error i retorn 0
+					else {
+						console.log('No coincideix versio');
+						callback(0);
+						}
+					}
+				else {
+					// recorre totes les versions per trobar la mes antiga
+					var pos=0;
+					var keyObject='';
+					var dataVer = data.Versions[0].LastModified;
+					for (var i = 0; i < data.Versions.length; i++){
+						if (data.Versions[i].LastModified < dataVer)
+							{dataVer = data.Versions[i].LastModified;
+							 keyObject = data.Versions[i].Key;
+							 pos=i;}
+					}
+					// comprova si la versio mes vella es igual a la gravada
+					// i retorna 1 de ok
+					if (data.Versions[pos].VersionId == ver){
+						console.log('Es el mes antic');
+						callback(1);
+					}
+					else {
+						var versFirst = data.Versions[pos].VersionId;
+						// si no es la mes vella treu l'entrada
+						deleteObject(shash, lurl, versFirst, function(err, data){
+						if (!err){
+							// mira si la URL es la mateixa
+							// si es afimatiu retorna 1 de ok
+							// sino retorn 2
+							
+							existsURLVersion(shash, lurl, callback, function (e) {
+								  if(e==1){callback(1);}
+								  else if (e==2){callback(2)});
+							});
+						}
+					}
+				}
+			}
+			
+		});
+  }
+
+
+  
   /*
    * This function delete s3 object. 
    */
@@ -132,65 +191,31 @@ function getKeys(obj){
   		});
     }
     
-   
-     function existAnotherVersion(shash, lurl, vers, callback){
-   	  var params = {Bucket:config.S3.Bucket, Prefix:shash};
-   	  s3.listObjectVersions(params, function(err, data){
+    /*This Function is used to know if url redirect with version already exists:
+     * Return 0 when this object doesn't exist.
+     * Return 1 when this object exists and have the same redirect.
+     * Return 2 when this object exists but doesn't have the same redirect.
+     * 
+     */
+     function existURLVersion(shash, lurl, vers, callback){
+   	  var params = {Bucket:config.S3.Bucket, Key:shash, VersionId:vers};
+   	 s3.headObject(params, function(err, data){
+   		  
    			if (err) {
-   				console.log(err);
    				callback(0);
    				  			}
    			else {
-   				// comprova si nomes hi ha una sola versio i retorna 1
-   				if (data.Versions.length == 0){
-   					if (data.Versions[0].VersionId == vers){
-   						console.log('Sols un i te la mateixa versio');
-   						console.log(vers);
-   						callback(1);
-   						}
-   					// cas d'error i retorn 0
-   					else {
-   						console.log('No coincideix versio');
-   						callback(0);
-   						}
-   					}
-   				else {
-   					// recorre totes les versions per trobar la mes antiga
-   					var pos=0;
-   					var keyObject='';
-   					var dataVer = data.Versions[0].LastModified;
-   					for (var i = 0; i < data.Versions.length; i++){
-   						if (data.Versions[i].LastModified < dataVer)
-   							{dataVer = data.Versions[i].LastModified;
-   							 keyObject = data.Versions[i].Key;
-   							 pos=i;}
-   					}
-   					// comprova si la versio mes vella es igual a la gravada
-   					// i retorna 1
-   					if (data.Versions[pos].VersionId == ver){
-   						console.log('Es el mes antic');
-   						callback(1);
-   					}
-   					else {
-   						// si no es la mes vella treu l'entrada
-   						deleteObject(shash, lurl, vers, function(err, data){
-   						if (!err){
-   							// mira si la URL es la mateixa
-   							// si es afimatiu retorna 1
-   							// sino retorn 2
-   							existsURL(shash, lurl, function (e) {
-   								  if(e==1){callback(1);}
-   								  else if (e==2){callback(2)});
-   							});
-   						}
-   					}
+   				if (data.WebsiteRedirectLocation == lurl) {
+   					callback(1);
+   				} else {
+   					callback(2);
    				}
    			}
    			
    		});
      }
-
-    
+         
+      
  /*
  * This function captures parameters from the url. First parameter is behind ?, 
  * Other parameters are behind & symbol.
@@ -213,6 +238,17 @@ function getParams(url)
                 
     return params;
 };
+
+/*
+ * This function returns 8 digits hash code of passed value
+ */
+function getKeys(obj){
+    var key;
+    key= md5.md5(obj);
+           var key2; 
+           key2 = key.substring(0, 8);
+    return key2;
+	}
 
 
 exports.collision = collision;
