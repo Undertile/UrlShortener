@@ -43,11 +43,9 @@ function collision(paramsUrl, callback) {
 						  else if (t==2) {
 							  shash=shash+'1';
 							  getValidHash(shash, lurl, callback);}
-							  });
+					  });
 				  	});
 					  //callback(shash,0);  
-				  });
-				    
 			  } 				 
 			  else if (e==1) {
 				  callback(shash,1);
@@ -117,7 +115,7 @@ function collision(paramsUrl, callback) {
 							{dataVer = data.Versions[i].LastModified;
 							 keyObject = data.Versions[i].Key;
 							 pos=i;}
-					}
+						}
 					// comprova si la versio mes vella es igual a la gravada
 					// i retorna 1 de ok
 					if (data.Versions[pos].VersionId == ver){
@@ -128,25 +126,27 @@ function collision(paramsUrl, callback) {
 						var versFirst = data.Versions[pos].VersionId;
 						// si no es la mes vella treu l'entrada
 						deleteObject(shash, lurl, versFirst, function(err, data){
-						if (!err){
+							if (!err){
 							// mira si la URL es la mateixa
 							// si es afimatiu retorna 1 de ok
 							// sino retorn 2
 							
 							existsURLVersion(shash, lurl, callback, function (e) {
-								  if(e==1){callback(1);}
-								  else if (e==2){callback(2)});
+								  if(e==1){
+									  callback(1);
+								  }
+								  else if (e==2){
+									  callback(2);
+								  }
 							});
-						}
+							}
+						});
 					}
 				}
 			}
-			
 		});
   }
 
-
-  
   /*
    * This function delete s3 object. 
    */
