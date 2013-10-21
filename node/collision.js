@@ -17,6 +17,7 @@ function collision(paramsUrl, callback) {
 		  var params = getParams(pathname);
 		  var lurl= params["url"];
 		  var shash = getKeys(lurl);
+		  var shash = "aL72JYmu";
 		  getValidHash(shash, lurl, function (shash,e) {
 			  
 //			  if (e==0) {

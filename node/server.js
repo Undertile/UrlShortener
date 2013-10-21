@@ -2,7 +2,7 @@ var http = require("http");
 var url = require('url');
 var shorten = require('./shorten.js');
 var version = require('./version.js');
-var version = require('./collision.js');
+var collision = require('./collision.js');
 var config = require('./config');
 
 function start() {	
