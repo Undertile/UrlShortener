@@ -1,0 +1,27 @@
+{
+  "name": "ut-urlshortener",
+  "version": "0.1",
+  "dependencies": {
+	    "aws-sdk": {
+	      "version": "~1.9.x",
+	      "dependencies": {
+	        "xml2js": {
+	          "version": "0.2.4",
+	          "dependencies": {
+	            "sax": {
+	              "version": "0.5.5"
+	            }
+	          }
+	        },
+	        "xmlbuilder": {
+	          "version": "0.4.2"
+	        }
+	      }
+	    }
+	  }
+
+  "engines": {
+    "node": "0.6.12",
+    "npm": "1.1.4"
+  }
+}

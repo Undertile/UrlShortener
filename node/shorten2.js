@@ -10,13 +10,13 @@
 	var config = require('./config');
 	var AWS = require('aws-sdk');
 	AWS.config.loadFromPath(config.S3.CredentialsPath);
-	var s3 = new AWS.S3(); 
+	var s3 = new AWS.S3();
 
-function version(paramsUrl, callback) {
+function shorten(paramsUrl, callback) {
 		  var pathname = paramsUrl;
 		  var params = getParams(pathname);
 		  var lurl= params["url"];
-		  var shash = getKeys(lurl);
+		  var shash = getKeys(lurl, 8);
 		  getValidHash(shash, lurl, function (shash,e) {
 			  
 			  if (e==0) {
@@ -35,13 +35,11 @@ function version(paramsUrl, callback) {
 				  callback(shash,0);  
 			  } 				 
 			  else if (e==1) {
-				  //callback(shash,1);
-				  callback(shash,0);
+				  callback(shash,1);
 			  }
 			  else if (e==2){
-				  callback(shash,0);
-				  //shash=shash+'1';
-				  //getValidHash(shash, lurl, callback);
+				  shash=shash+'1';
+				  getValidHash(shash, lurl, callback);
 			  }
 			  
 		  });
@@ -50,11 +48,11 @@ function version(paramsUrl, callback) {
 /*
  * This function returns 8 digits hash code of passed value
  */
-function getKeys(obj){
+function getKeys(obj, len){
     var key;
     key= md5.md5(obj);
            var key2; 
-           key2 = key.substring(0, 8);
+           key2 = key.substring(0, len);
     return key2;
 	}
 /*
@@ -62,30 +60,16 @@ function getKeys(obj){
  */
   function createObject(shash, lurl){
 	  var params = null;
-	  var params2 = null;
-	  //shash = "aL72JYmu";
 	  
 	  params = {Bucket:config.S3.Bucket, Key:shash, WebsiteRedirectLocation:lurl,
 				  ContentType:'text/html', CacheControl:'no-cache'};
-	  params2 = {Bucket:config.S3.Bucket, Prefix:shash};
 
-	  s3.listObjectVersions(params2, function(err, data){
+	  s3.putObject(params, function(err, data){
 			if (err) {
 				console.log(err);
-			} else {console.log(data);}
-		});
-
-	s3.putObject(params, function(err, data){
-			if (err) {
-				console.log(err);
-			} else {console.log(data.ETag);
-					console.log(data.VersionId);
-					console.log(lurl);
-					console.log(shash);
 			}
 		});
   }
-  
   
     
    /*This Function is used to know if url redirect already exists:
@@ -137,7 +121,7 @@ function getParams(url)
 };
 
 
-exports.version = version;
+exports.shorten = shorten;
 
 
 
