@@ -4,11 +4,11 @@ config.S3 = {};
 config.servidor = {};
 config.local = {};
 
-config.S3.CredentialsPath = '/etc/UrlShortener/credencialsS3.json';
-config.S3.Bucket = 'und.tl';
-config.servidor.Port = 8080;
+config.S3.CredentialsPath = '[pathto credencialsS3.json]';
+config.S3.Bucket = 'yourS3Bucket';
+config.servidor.Port = 80;
 config.local.Path = 'localhost';
-config.local.Link = 'http://und.tl/';
+config.local.Link = 'serviceDomain';
 config.local.LongHash = 8;
 
 module.exports = config;
