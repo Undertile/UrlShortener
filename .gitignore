@@ -3,4 +3,5 @@ $ cat .gitignore
 .project
 .metadata
 node/config.js
+node/node_modules/*
 

@@ -1,8 +1,13 @@
 {
   "name": "node",
   "version": "0.1.0",
-  "description": "node",
-  "main": "hello-world-server.js",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "aws-sdk": "~1.9.0",
+    "log4js": "~0.6.9"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified! Configure in package.json\" && exit 1"
   },

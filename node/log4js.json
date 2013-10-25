@@ -1,0 +1,15 @@
+{
+  "appenders": [
+    {
+      "type": "file",
+      "absolute": true,
+      "filename": "/var/log/undertile/shortener.log",
+      "maxLogSize": 20480,
+      "backups": 10,
+      "category": "logShortener"          
+    }
+  ],
+ "levels": {
+    "error-log":  "INFO"
+  } 
+}

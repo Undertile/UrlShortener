@@ -13,6 +13,11 @@
  */
 
 
+GLOBAL.logger = log4js.getLogger('logShortener');
+
+process.on('uncaughtException', function(err) {
+    GLOBAL.logger.error('uncaughtException', err);
+});
 
 var server = require("./server");
 
