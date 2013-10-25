@@ -19,17 +19,6 @@ function shorten(paramsUrl, callback) {
 		  var lurl= params["url"];
 		  var shash = getKeys(lurl, hashLen);
 		  
-		  //lurl = "http://www.prova2.com";
-		  
-//		  var shash = "fsPewUqI";
-//		  var vers = 'CW2us_U0KfQCv2MGjJZ4NxQnPWjdaEeM'
-//		  
-//		  
-//		  deleteObject(shash, vers, function(e){
-//			  if(e) console.log('Esborra');
-//			  else console.log('No esborra');
-//		  });
-		  
 		  function _callback(r) {
 			  if (r) { 
 				  console.log('Retorn hash:'+shash);
@@ -76,9 +65,8 @@ function shorten(paramsUrl, callback) {
   }
 
   /*This function check if there are others versions of the object
-   * Return 0 when there is an error.
-   * Return 1 when the object is the only one and with the correct URL.
-   * Return 2 when the object must be changed.
+   * Return true when any error.
+   * Return false when the object must be changed.
    * 
    */
   
@@ -90,7 +78,6 @@ function shorten(paramsUrl, callback) {
 				callback(false);
 			}
 			else {
-				// comprova si nomes hi ha una sola versio i retorna 1 de ok
 				if (data.Versions.length == 1){
 					console.log('Numero de versions:'+data.Versions.length);
 					if (data.Versions[0].VersionId == vers){
@@ -98,7 +85,6 @@ function shorten(paramsUrl, callback) {
 						console.log(vers);
 						callback(true);
 						}
-					// cas d'error i retorn 0
 					else {
 						console.log('No coincideix versio');
 						callback(false);
@@ -139,7 +125,7 @@ function shorten(paramsUrl, callback) {
   }
 
   /*
-   * This function delete s3 object. 
+   * This function delete s3 object with a specify versionId 
    */
     function deleteObject(shash, vers, callback){
       	
@@ -159,34 +145,11 @@ function shorten(paramsUrl, callback) {
     }
 
     
-   /*This Function is used to know if url redirect already exists:
-    * Return 0 when this object doesn't exist.
-    * Return 1 when this object exists and have the same redirect.
-    * Return 2 when this object exists but doesn't have the same redirect.
-    * 
-    */
-    function existURL(shash, lurl, callback){
-  	  var params = {Bucket:config.S3.Bucket, Key:shash};
-  	 s3.headObject(params, function(err, data){
-  		  
-  			if (err) {
-  				callback(0);
-  				  			}
-  			else {
-  				if (data.WebsiteRedirectLocation == lurl) {
-  					callback(1);
-  				} else {
-  					callback(2);
-  				}
-  			}
-  			
-  		});
-    }
     
     /*This Function is used to know if url redirect with version already exists:
-     * Return 0 when this object doesn't exist.
-     * Return 1 when this object exists and have the same redirect.
-     * Return 2 when this object exists but doesn't have the same redirect.
+     * Return true when this object exist with the same redirect.
+     * Return false when error or when this object exists and haven't the 
+     * same redirect.
      * 
      */
      function existURLVersion(shash, lurl, vers, callback){
@@ -234,7 +197,8 @@ function getParams(url)
 };
 
 /*
- * This function returns 8 digits hash code of passed value
+ * This function returns X digits hash code (dependening of len parameter) 
+ * of passed value
  */
 function getKeys(obj, len){
     var key;
@@ -246,6 +210,3 @@ function getKeys(obj, len){
 
 
 exports.shorten = shorten;
-
-
-
