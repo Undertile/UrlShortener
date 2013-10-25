@@ -1,0 +1,17 @@
+var config = {};
+
+config.S3 = {};
+config.servidor = {};
+config.local = {};
+
+config.S3.CredentialsPath = '[pathto credencialsS3.json]';
+config.S3.Bucket = 'yourS3Bucket';
+config.servidor.Port = 80;
+config.local.Path = 'localhost';
+config.local.Link = 'serviceDomain';
+config.local.LongHash = 8;
+
+module.exports = config;
+
+
+
