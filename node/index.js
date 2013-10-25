@@ -13,7 +13,11 @@
  */
 
 
+var log4js = require("log4js");
+log4js.configure('log4js.json', {});
 GLOBAL.logger = log4js.getLogger('logShortener');
+
+//logger.setLevel('ERROR');
 
 process.on('uncaughtException', function(err) {
     GLOBAL.logger.error('uncaughtException', err);
