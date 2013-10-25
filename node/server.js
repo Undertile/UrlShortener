@@ -23,7 +23,7 @@ function start() {
 				break;
 				
 			default:
-				console.log("It has a incorrect URL");
+				GLOBAL.logger.error("It has a incorrect URL");
 			break;
 			}
 		};

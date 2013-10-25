@@ -21,10 +21,11 @@ function shorten(paramsUrl, callback) {
 		  
 		  function _callback(r) {
 			  if (r) { 
+				  GLOBAL.logger.info('Retorn objecte: '+shash+' amb URL: '+lurl);
 				  callback(shash); 
 			  }	else {
 				  hashLen++;
-				  console.log('Long hash to:'+hashLen);
+				  GLOBAL.logger.info('Long hash to:'+hashLen);
 				  shash = getKeys(lurl, hashLen);
 				  getValidHash(shash, lurl, _callback);
 			  }
@@ -53,7 +54,7 @@ function shorten(paramsUrl, callback) {
 
 	  s3.putObject(params, function(err, data){
 			if (err) {
-				console.log(err);
+				GLOBAL.logger.error(err);
 				callback(err);
 			}
 			else {
@@ -71,7 +72,7 @@ function shorten(paramsUrl, callback) {
 	  var params = {Bucket:config.S3.Bucket, Prefix:shash};
 	  s3.listObjectVersions(params, function(err, data){
 			if (err) {
-				console.log(err);
+				GLOBAL.logger.error(err);
 				callback(false);
 			}
 			else {
@@ -80,14 +81,14 @@ function shorten(paramsUrl, callback) {
 						callback(true);
 						}
 					else {
-						console.log('Only one, but not same version');
+						GLOBAL.logger.error('Only one, but not same version');
 						callback(false);
 						}
 					}
 				else {
 					var pos=0;
 					var keyObject='';
-					console.log('Count of versions:'+data.Versions.length);
+					GLOBAL.logger.info('Count of versions:'+data.Versions.length);
 					var dataVer = data.Versions[0].LastModified;
 					for (var i = 0; i < data.Versions.length; i++) {
 						if (data.Versions[i].LastModified < dataVer) {
@@ -120,7 +121,7 @@ function shorten(paramsUrl, callback) {
   	  params = {Bucket:config.S3.Bucket, Key:shash, VersionId:vers};
   	  	  s3.deleteObject(params, function(err, data){
     			if (err) {
-    				console.log("ErrorDeleteObject: ", params, err);
+    				GLOBAL.logger.error("ErrorDeleteObject: ", params, err);
     				callback(false);
     			}
     			else {
@@ -139,12 +140,15 @@ function shorten(paramsUrl, callback) {
    	  var params = {Bucket:config.S3.Bucket, Key:shash, VersionId:vers};
    	  s3.headObject(params, function(err, data){
    			if (err) {
+   				GLOBAL.logger.error(err);
    				callback(false);
    				  			}
    			else {
    				if (data.WebsiteRedirectLocation == lurl) {
+   					GLOBAL.logger.info('Mateixa Url: '+lurl);
    					callback(true);
    				} else {
+   					GLOBAL.logger.info('Url diferent: '+data.WebsiteRedirectLocation);
    					callback(false);
    				}
    			}
