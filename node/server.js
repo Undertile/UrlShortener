@@ -16,9 +16,14 @@ function start() {
 			{
 			case "/shorten":
 				shorten.shorten(pathname, function(numhash){
-					response.writeHead(200, {"Content-Type": "text/html"});
-					response.write(config.local.Link+numhash);
-					response.end();
+					if (numhash) {
+						response.writeHead(200, {"Content-Type": "text/html"});
+						response.write(config.local.Link+numhash);
+						response.end();
+					} else {
+						response.writeHead(500);
+						response.end();
+					}
 				});
 				break;
 				

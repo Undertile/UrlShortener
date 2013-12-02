@@ -5,41 +5,58 @@
  * Return values:
  *  - The key (name) of the object created.
  */
-	var url = require('url');
-	var md5 = require("./md5");
-	var config = require('./config');
-	var AWS = require('aws-sdk');
-	AWS.config.loadFromPath(config.S3.CredentialsPath);
-	var s3 = new AWS.S3();
+
+var ERR_INTERN = 1;
+var ERR_HASH_DUPLICAT = 2;
+
+var url = require('url');
+var md5 = require("./md5");
+var config = require('./config');
+var AWS = require('aws-sdk');
+AWS.config.loadFromPath(config.S3.CredentialsPath);
+var s3 = new AWS.S3();
 
 function shorten(paramsUrl, callback) {
-		  var hashLen = config.local.LongHash;
-		  var pathname = paramsUrl;
-		  var params = getParams(pathname);
-		  var lurl= params["url"];
-		  var shash = getKeys(lurl, hashLen);
-		  
-		  function _callback(r) {
-			  if (r) { 
-				  GLOBAL.logger.info('Retorn objecte: '+shash+' amb URL: '+lurl);
-				  callback(shash); 
-			  }	else {
-				  hashLen++;
-				  GLOBAL.logger.info('Long hash to:'+hashLen);
-				  shash = getKeys(lurl, hashLen);
-				  getValidHash(shash, lurl, _callback);
+		  try {
+			  var hashLen = config.local.LongHash;
+			  var pathname = paramsUrl;
+			  var params = getParams(pathname);
+			  var lurl= params["url"];
+			  var shash = getKeys(lurl, hashLen);
+			  
+			  function _callback(result, error) {
+				  if (result) { 
+					  GLOBAL.logger.info('Retorn objecte: '+shash+' amb URL: '+lurl);
+					  callback(shash); 
+				  }	else {
+					  if (error == ERR_HASH_DUPLICAT) {
+						  hashLen++;
+						  GLOBAL.logger.info('Long hash to:'+hashLen);
+						  shash = getKeys(lurl, hashLen);
+						  getValidHash(shash, lurl, _callback);
+					  } else {
+						  callback();
+					  }
+				  }
 			  }
+			  
+			  getValidHash(shash, lurl, _callback);
+		  } catch (err) {
+			  GLOBAL.logger.error(err);
+			  _callback();
 		  }
-		  
-		  getValidHash(shash, lurl, _callback);
 }
 
 	/*
 	 * This function returns a valid hash with e parameter to indicate if object should be created.
 	 */
 	function getValidHash(shash, lurl, callback) {
-		  createObject(shash, lurl, function (vers){
-			  checkOthersVersions(shash, lurl, vers, callback);
+		  createObject(shash, lurl, function (result, vers){
+			  if (result) {
+				  checkOthersVersions(shash, lurl, vers, callback);
+			  } else {
+				  callback(false, ERR_INTERN);
+			  }
 		  });
 	}
 	
@@ -55,10 +72,11 @@ function shorten(paramsUrl, callback) {
 	  s3.putObject(params, function(err, data){
 			if (err) {
 				GLOBAL.logger.error(err);
-				callback(err);
+				callback(false, err);
 			}
 			else {
-					callback(data.VersionId)}
+				callback(true, data.VersionId)
+			}
 		});
   }
 
@@ -73,7 +91,7 @@ function shorten(paramsUrl, callback) {
 	  s3.listObjectVersions(params, function(err, data){
 			if (err) {
 				GLOBAL.logger.error(err);
-				callback(false);
+				callback(false, ERR_INTERN);
 			}
 			else {
 				if (data.Versions.length == 1){
@@ -82,7 +100,7 @@ function shorten(paramsUrl, callback) {
 						}
 					else {
 						GLOBAL.logger.error('Only one, but not same version');
-						callback(false);
+						callback(false, ERR_HASH_DUPLICAT);
 						}
 					}
 				else {
@@ -102,8 +120,13 @@ function shorten(paramsUrl, callback) {
 					}
 					else {
 						var versFirst = data.Versions[pos].VersionId;
-						deleteObject(shash, vers, function(e){
-							existURLVersion(shash, lurl, versFirst, callback);
+						deleteObject(shash, vers, function(err){
+							if (err) {
+								GLOBAL.logger.error(err);
+								callback(false, ERR_INTERN);
+							} else {
+								existURLVersion(shash, lurl, versFirst, callback);
+							}
 						});
 					}
 				}
@@ -125,8 +148,8 @@ function shorten(paramsUrl, callback) {
     				callback(false);
     			}
     			else {
-    					callback(true);
-    					}
+    				callback(true);
+    			}
     		});
     }
     
@@ -141,15 +164,15 @@ function shorten(paramsUrl, callback) {
    	  s3.headObject(params, function(err, data){
    			if (err) {
    				GLOBAL.logger.error(err);
-   				callback(false);
-   				  			}
+   				callback(false, ERR_INTERN);
+   			}
    			else {
    				if (data.WebsiteRedirectLocation == lurl) {
    					GLOBAL.logger.info('Mateixa Url: '+lurl);
    					callback(true);
    				} else {
    					GLOBAL.logger.info('Url diferent: '+data.WebsiteRedirectLocation);
-   					callback(false);
+   					callback(false, ERR_HASH_DUPLICAT);
    				}
    			}
    			
